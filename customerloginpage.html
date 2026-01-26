@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Login - Meod Farm</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Center the entire page */
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            /* horizontal center */
+            align-items: center;
+            /* vertical center */
+            background-color: #ffffff;
+        }
+
+        /* Container for the login page */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* horizontal center */
+            text-align: center;
+            gap: 5px;
+            /* same as start page spacing */
+        }
+
+        /* Logo */
+        .logo {
+            width: 250px;
+            /* same as start page */
+            max-width: 80vw;
+            /* responsive */
+            margin-bottom: 1px;
+            /* small spacing to heading */
+        }
+
+
+        /* Welcome text */
+        .welcome-text {
+            font-size: 20px;
+            color: #999999;
+            /* light grey */
+            width: 250px;
+            /* same as logo width */
+            margin-bottom: 90px;
+            /* bigger gap to next text */
+        }
+
+        /* Login form */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            width: 280px;
+            /* username/password field width */
+            gap: 10px;
+            /* spacing between input fields */
+        }
+
+        /* Input fields */
+        .login-form input {
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #000;
+            border-radius: 4px;
+        }
+
+        /* Forgot Password Link */
+        .forgot-link {
+            font-size: 9px;
+            text-align: left;
+            color: #0000EE;
+            text-decoration: none;
+            margin-top: 0.1px;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Login Button */
+        .login-btn {
+            width: 140px;
+            /* smaller than input width */
+            padding: 15px 0;
+            /* same as start page button */
+            font-size: 14px;
+            background-color: #fff;
+            border: 1px solid #000;
+            border-radius: 6px;
+            /* match start page rounded corners */
+            cursor: pointer;
+            align-self: center;
+            /* center the button */
+            margin-top: 15px;
+            transition: all 0.2s ease;
+            /* hover effect */
+        }
+
+        .login-btn:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+            /* same as start page button hover */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <!-- Logo -->
+        <img src="logo.png" alt="Meod Logo" class="logo">
+        <p class="welcome-text">-Welcome Back Customer!-</p>
+
+        <!-- Login form -->
+        <!-- Login form -->
+        <form class="login-form" id="loginForm">
+            <!-- Username -->
+            <input type="text" placeholder="Username" required>
+
+            <!-- Password -->
+            <input type="password" placeholder="Password" required minlength="8">
+
+            <a href="#" class="forgot-link">Forgot Password?</a>
+
+            <!-- Submit button -->
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+    </div>
+
+    <!-- JS for validation + redirect -->
+    <script>
+        const form = document.getElementById('loginForm');
+        form.addEventListener('submit', function (e) {
+            e.preventDefault(); // stop default submission
+
+            // Only redirect if all fields are valid
+            if (form.checkValidity()) {
+                location.href = 'customerhomepage.html';
+            }
+        });
+    </script>
+
+    </div>
+
+</body>
+
+</html>

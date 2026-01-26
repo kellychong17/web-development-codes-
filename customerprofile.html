@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Profile - Meod Farm</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f2f4f2;
+        }
+
+        /* ===== NAVBAR ===== */
+        .horizontal-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #46923c;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .hamburger {
+            font-size: 26px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .nav-logo {
+            height: 38px;
+            cursor: pointer;
+        }
+
+        .nav-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-center a {
+            text-decoration: none;
+            color: white;
+            font-size: 15px;
+        }
+
+        .nav-center a.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: -260px;
+            width: 260px;
+            height: calc(100vh - 60px);
+            background-color: #f8f8f8;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 999;
+            padding-top: 10px;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-links a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .sidebar-links a span {
+            margin-right: 10px;
+        }
+
+        .sidebar-links a:hover {
+            background-color: #e6f0e4;
+        }
+
+        .logout-btn {
+            margin: 20px;
+            padding: 12px;
+            background-color: #46923c;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            padding: 90px 30px 30px;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* ===== GRID FOR HEADER CARDS ===== */
+        .header-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        /* ===== WHITE CARDS ===== */
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        /* ===== PROFILE CARD ===== */
+        .user-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .edit-profile {
+            font-size: 14px;
+            color: #46923c;
+            text-decoration: none;
+        }
+
+        /* ===== SHORTCUTS CARD ===== */
+        .shortcuts-inline h3 {
+            font-size: 16px;
+            color: #2e6b2e;
+            margin-bottom: 15px;
+        }
+
+        .shortcut-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .button-link {
+            padding: 8px 15px;
+            background-color: #eef7ec;
+            border: 1px solid #46923c;
+            color: #46923c;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .button-link:hover {
+            background-color: #46923c;
+            color: white;
+        }
+
+        /* ===== PROFILE CONTENT GRID ===== */
+        .profile-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        /* ===== PERSONAL INFO & NEW ITEMS ===== */
+        .card h3 {
+            margin-bottom: 15px;
+            color: #2e6b2e;
+        }
+
+        .card p {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .info-label {
+            font-weight: bold;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .item-placeholder {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            object-fit: cover;
+            transition: transform 0.2s ease;
+        }
+
+        .item-placeholder:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="horizontal-navbar">
+    <div class="nav-left">
+        <span id="hamburger" class="hamburger">&#9776;</span>
+        <img src="logo.png" class="nav-logo" onclick="location.href='customerhomepage.html'">
+    </div>
+</nav>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+    <div class="sidebar-links">
+        <a href="customerhomepage.html"><span>🏠</span> Home</a>
+        <a href="customerprofile.html"><span>👤</span> Profile</a>
+        <a href="shop.html"><span>🛒</span> Shop</a>
+        <a href="cart.html"><span>🛍️</span> Cart</a>
+        <a href="orderhistory.html"><span>📜</span> Order History</a>
+        <a href="productcatalogue.html"><span>📦</span> Product Catalogue</a>
+        <a href="faq.html"><span>❓</span> FAQ</a>
+    </div>
+    <button class="logout-btn" onclick="location.href='startpage.html'">Log out</button>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+
+    <!-- HEADER CARDS: Profile + Shortcuts side by side -->
+    <div class="header-cards">
+        <div class="card">
+            <div class="user-info">
+                <img src="profile pic.png" class="user-avatar">
+                <div>
+                    <h2>User Full Name</h2>
+                    <p>Customer ID: 987654321</p>
+                    <a href="#" class="edit-profile">Edit Profile</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="shortcuts-inline">
+                <h3>Shortcuts:</h3>
+                <div class="shortcut-buttons">
+                    <a href="shop.html" class="button-link">Shop</a>
+                    <a href="cart.html" class="button-link">View Cart</a>
+                    <a href="orderhistory.html" class="button-link">Order History</a>
+                    <a href="payment.html" class="button-link">Payment Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENT CARDS: Personal Info + New Items -->
+    <div class="profile-content">
+        <div class="card">
+            <h3>Personal Information</h3>
+            <p><span class="info-label">Phone number:</span> 9900 1122</p>
+            <p><span class="info-label">Home number:</span> 6677 8899</p>
+            <p><span class="info-label">Birth Date:</span> 31 December 1999</p>
+            <p><span class="info-label">Gender:</span> Male/Female</p>
+            <p><span class="info-label">Address:</span> Yio Chu Kang Blk123 Avenue1</p>
+            <p><span class="info-label">Postal Code:</span> S789012</p>
+            <p><span class="info-label">Email Address:</span> efg456@gmail.com</p>
+        </div>
+
+        <div class="card">
+            <h3>New Items 🔔</h3>
+            <div class="items-grid">
+                <img src="LB lettuce.png" class="item-placeholder">
+                <img src="cos lettuce.png" class="item-placeholder">
+                <!--<img src="jiu bai cai.png" class="item-placeholder">
+                <img src="mao bai.png" class="item-placeholder">-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.querySelector('.main-content');
+
+    hamburger.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '0';
+    });
+</script>
+
+</body>
+</html>
