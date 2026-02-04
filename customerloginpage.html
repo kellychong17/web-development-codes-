@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Login - Meod Farm</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            position: relative;
+        }
+
+        .signup-link {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 12px;
+            color: #0000EE;
+            text-decoration: none;
+        }
+        .signup-link:hover { text-decoration: underline; }
+
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 5px;
+        }
+
+        .logo { width: 250px; max-width: 80vw; margin-bottom: 1px; }
+
+        .welcome-text {
+            font-size: 20px;
+            color: #999999;
+            width: 250px;
+            margin-bottom: 90px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            width: 280px;
+            gap: 10px;
+        }
+
+        .login-form input {
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #000;
+            border-radius: 4px;
+        }
+
+        .forgot-link {
+            font-size: 9px;
+            text-align: left;
+            color: #0000EE;
+            text-decoration: none;
+            margin-top: 0.1px;
+        }
+        .forgot-link:hover { text-decoration: underline; }
+
+        .login-btn {
+            width: 140px;
+            padding: 15px 0;
+            font-size: 14px;
+            background-color: #fff;
+            border: 1px solid #000;
+            border-radius: 6px;
+            cursor: pointer;
+            align-self: center;
+            margin-top: 15px;
+            transition: all 0.2s ease;
+        }
+        .login-btn:hover { background-color: #f0f0f0; transform: scale(1.05); }
+
+        .msg-success { font-size: 12px; color: green; margin-bottom: 10px; }
+        .msg-error { font-size: 12px; color: red; margin-bottom: 10px; }
+    </style>
+</head>
+
+<body>
+    <a href="/customersignup" class="signup-link">Sign Up</a>
+
+    <div class="login-container">
+
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Meod Logo" class="logo">
+        <p class="welcome-text">-Welcome Back Customer!-</p>
+
+        {% if request.args.get('success') %}
+        <p class="msg-success">Account created successfully. Please log in.</p>
+        {% endif %}
+
+        {% if error %}
+        <p class="msg-error">{{ error }}</p>
+        {% endif %}
+
+        <form class="login-form" method="POST" action="/customerlogin">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required minlength="8">
+            <a href="#" class="forgot-link">Forgot Password?</a>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+    </div>
+</body>
+
+</html>

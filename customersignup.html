@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Sign Up - Meod Farm</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+        }
+
+        .signup-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 5px;
+        }
+
+        .logo { width: 250px; max-width: 80vw; margin-bottom: 5px; }
+
+        .welcome-text {
+            font-size: 20px;
+            color: #999999;
+            width: 250px;
+            margin-bottom: 60px;
+        }
+
+        .signup-form {
+            display: flex;
+            flex-direction: column;
+            width: 280px;
+            gap: 10px;
+        }
+
+        .signup-form input {
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #000;
+            border-radius: 4px;
+        }
+
+        .signup-btn {
+            width: 140px;
+            padding: 15px 0;
+            font-size: 14px;
+            background-color: #fff;
+            border: 1px solid #000;
+            border-radius: 6px;
+            cursor: pointer;
+            align-self: center;
+            margin-top: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .signup-btn:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        .back-link {
+            margin-top: 15px;
+            font-size: 10px;
+            text-decoration: none;
+            color: #0000EE;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        .msg-error { font-size: 12px; color: red; margin-bottom: 10px; }
+    </style>
+</head>
+
+<body>
+
+    <div class="signup-container">
+
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Meod Logo" class="logo">
+        <p class="welcome-text">-Create Customer Account-</p>
+
+        {% if error %}
+        <p class="msg-error">{{ error }}</p>
+        {% endif %}
+
+        <form class="signup-form" method="POST" action="/customersignup">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required minlength="8">
+            <button type="submit" class="signup-btn">Sign Up</button>
+        </form>
+
+        <a href="/" class="back-link">Back to Login</a>
+
+    </div>
+
+</body>
+</html>
