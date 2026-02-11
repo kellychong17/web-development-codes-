@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Management - Meod Farm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f2f4f2;
+        }
+
+        /* ===== NAVBAR (GREEN TOP BAR) ===== */
+        .horizontal-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #46923c;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .hamburger {
+            font-size: 26px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .nav-logo {
+            height: 38px;
+            cursor: pointer;
+        }
+
+        /* ===== SIDEBAR (SAME AS YOUR EMPLOYEE PAGES) ===== */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: -260px;
+            width: 260px;
+            height: calc(100vh - 60px);
+            background-color: #f8f8f8;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-links a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .sidebar-links a span {
+            margin-right: 10px;
+        }
+
+        .sidebar-links a:hover {
+            background-color: #e6f0e4;
+        }
+
+        .logout-btn {
+            margin: 20px;
+            padding: 12px;
+            background-color: #46923c;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .logout-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            padding: 90px 30px 30px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 46px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        /* Two boxes */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+            border: 1px solid #e6e6e6;
+            min-height: 470px;
+        }
+
+        .card h2 {
+            text-align: center;
+            font-size: 26px;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        label {
+            display: block;
+            margin: 14px 0 8px;
+            font-size: 15px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .forgot {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #0b66c3;
+            text-decoration: none;
+        }
+
+        .forgot:hover {
+            text-decoration: underline;
+        }
+
+        .btn-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 55px;
+        }
+
+        .login-btn {
+            width: 200px;
+            padding: 14px 0;
+            border-radius: 10px;
+            border: 1px solid #888;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .login-btn:hover {
+            background: #f3f3f3;
+        }
+
+        .error {
+            margin-top: 12px;
+            color: #c62828;
+            font-size: 13px;
+        }
+
+        @media (max-width: 1000px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="horizontal-navbar">
+        <div class="nav-left">
+            <span id="hamburger" class="hamburger">&#9776;</span>
+            <img src="{{ url_for('static', filename='logo.png') }}" class="nav-logo"
+                onclick="location.href='/employeehomepage'">
+        </div>
+    </nav>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-links">
+            <a href="/employeehomepage"><span>🏠</span> Home</a>
+            <a href="/employeeprofile"><span>👤</span> Profile</a>
+            <a href="{{ url_for('management') }}"><span>⚙️</span> Management</a>
+            <a href="#"><span>📊</span> Issue & Dashboard</a>
+            <a href="#"><span>📦</span> Order Management</a>
+            <a href="#"><span>⭐</span> Review Management</a>
+            <a href="#"><span>🧾</span> Product Administration</a>
+        </div>
+
+        <button class="logout-btn" onclick="location.href='/employeelogout'">Log out</button>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-content">
+        <div class="page-title">Management</div>
+
+        <div class="grid">
+
+            <!-- User Management Login -->
+            <div class="card">
+                <h2>User Management</h2>
+
+                <form method="POST" action="/management/userlogin">
+                    <label>Staff ID</label>
+                    <input name="staff_id" required>
+
+                    <label>Management Password</label>
+                    <input name="password" type="password" required minlength="8">
+
+                    <a class="forgot" href="#">Forgot Password?</a>
+
+                    {% if error_user %}
+                    <div class="error">{{ error_user }}</div>
+                    {% endif %}
+
+                    <div class="btn-wrap">
+                        <button class="login-btn" type="submit">Login</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Session Management Login -->
+            <div class="card">
+                <h2>Session Management</h2>
+
+                <form method="POST" action="/management/sessionlogin">
+                    <label>Staff ID</label>
+                    <input name="staff_id" required>
+
+                    <label>Management Password</label>
+                    <input name="password" type="password" required minlength="8">
+
+                    <a class="forgot" href="#">Forgot Password?</a>
+
+                    {% if error_session %}
+                    <div class="error">{{ error_session }}</div>
+                    {% endif %}
+
+                    <div class="btn-wrap">
+                        <button class="login-btn" type="submit">Login</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JS (same sidebar behavior) -->
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '0';
+        });
+    </script>
+
+</body>
+
+</html>

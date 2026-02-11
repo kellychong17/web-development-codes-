@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Management - Meod Farm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f2f4f2;
+        }
+
+        /* ===== NAVBAR ===== */
+        .horizontal-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #46923c;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .hamburger {
+            font-size: 26px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .nav-logo {
+            height: 38px;
+            cursor: pointer;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: -260px;
+            width: 260px;
+            height: calc(100vh - 60px);
+            background-color: #f8f8f8;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-top: 10px;
+            z-index: 999;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-links a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .sidebar-links a span {
+            margin-right: 10px;
+        }
+
+        .sidebar-links a:hover {
+            background-color: #e6f0e4;
+        }
+
+        .logout-btn {
+            margin: 20px;
+            padding: 12px;
+            background-color: #46923c;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* ===== MAIN ===== */
+        .main-content {
+            padding: 90px 30px 30px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            color: #2e6b2e;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #cfcfcf;
+            background: #f4f4f4;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            background: #eef7ec;
+            border-color: #46923c;
+            color: #2e6b2e;
+            font-weight: 600;
+        }
+
+        /* ===== TABLE ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* ===== BUTTONS ===== */
+        button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 6px;
+        }
+
+        .add-btn {
+            background-color: #46923c;
+            color: white;
+        }
+
+        .edit-btn {
+            background-color: #0277bd;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #c62828;
+            color: white;
+        }
+
+        .neutral-btn {
+            background-color: #555;
+            color: white;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 10000;
+        }
+
+        .modal-content {
+            background: white;
+            width: 420px;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 8% auto;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .small {
+            font-size: 12px;
+            color: #666;
+            margin-top: -6px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="horizontal-navbar">
+        <div class="nav-left">
+            <span id="hamburger" class="hamburger">&#9776;</span>
+            <a href="{{ url_for('employeehomepage') }}">
+                <img src="{{ url_for('static', filename='logo.png') }}" class="nav-logo">
+            </a>
+        </div>
+    </nav>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-links">
+            <a href="/employeehomepage"><span>🏠</span> Home</a>
+            <a href="/employeeprofile"><span>👤</span> Profile</a>
+            <a href="{{ url_for('management') }}"><span>⚙️</span> Management</a>
+            <a href="#"><span>📊</span> Issue & Dashboard</a>
+            <a href="#"><span>📦</span> Order Management</a>
+            <a href="#"><span>⭐</span> Review Management</a>
+            <a href="#"><span>🧾</span> Product Administration</a>
+        </div>
+
+        <button class="logout-btn" onclick="location.href='/employeelogout'">Log out</button>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <div class="card">
+            <h3>User Management</h3>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button id="tabEmp" class="tab-btn active" onclick="showTab('emp')">Employee Management</button>
+                <button id="tabCust" class="tab-btn" onclick="showTab('cust')">Customer Management</button>
+            </div>
+
+            <!-- ================= EMPLOYEE PANEL ================= -->
+            <div id="panelEmp">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <div class="hint">
+                        Default employee login password when created: <b>password123</b>
+                    </div>
+                    <button class="add-btn" onclick="openEmployeeAdd()">➕ Add Employee</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Staff ID</th>
+                            <th>Name</th>
+                            <th>Dept</th>
+                            <th>Role</th>
+                            <th>Email</th>
+                            <th style="width:160px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeeRows"></tbody>
+                </table>
+            </div>
+
+            <!-- ================= CUSTOMER PANEL ================= -->
+            <div id="panelCust" style="display:none;">
+                <div style="display:flex; justify-content:flex-end; align-items:center;">
+                    <button class="add-btn" onclick="openCustomerAdd()">➕ Add Customer</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer ID</th>
+                            <th>Username</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th style="width:220px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerRows"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= EMPLOYEE MODAL ================= -->
+    <div class="modal" id="employeeModal">
+        <div class="modal-content">
+            <h3 id="employeeModalTitle">Add Employee</h3>
+
+            <input id="emp_staff_id" placeholder="Staff ID (e.g., EMP004)">
+            <input id="emp_full_name" placeholder="Full Name">
+
+            <select id="emp_department">
+                <option value="">Select Department</option>
+                <option value="IT">IT</option>
+                <option value="HR">HR</option>
+                <option value="Finance">Finance</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Operations">Operations</option>
+            </select>
+
+            <select id="emp_role">
+                <option value="">Select Role</option>
+                <option value="Developer">Developer</option>
+                <option value="Manager">Manager</option>
+                <option value="Analyst">Analyst</option>
+                <option value="Designer">Designer</option>
+                <option value="Team Lead">Team Lead</option>
+            </select>
+
+            <input id="emp_work_email" placeholder="Work Email">
+
+            <div class="modal-actions">
+                <button class="add-btn" onclick="saveEmployee()">Confirm</button>
+                <button onclick="closeEmployeeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= CUSTOMER MODAL ================= -->
+    <div class="modal" id="customerModal">
+        <div class="modal-content">
+            <h3 id="customerModalTitle">Add Customer</h3>
+
+            <input id="cust_username" placeholder="Username (required)">
+            <input id="cust_password" placeholder="Password (min 8 chars)" type="password">
+            <input id="cust_full_name" placeholder="Full Name (optional)">
+            <input id="cust_email" placeholder="Email (optional)">
+            <input id="cust_phone" placeholder="Phone (optional)">
+
+            <div class="modal-actions">
+                <button class="add-btn" onclick="saveCustomer()">Confirm</button>
+                <button onclick="closeCustomerModal()">Cancel</button>
+            </div>
+
+            <div class="small" style="margin-top:10px;">
+                Tip: Use “Reset PW” button to change customer password later.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar toggle
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.main-content');
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '0';
+        });
+
+        // Tabs
+        const tabEmp = document.getElementById("tabEmp");
+        const tabCust = document.getElementById("tabCust");
+        const panelEmp = document.getElementById("panelEmp");
+        const panelCust = document.getElementById("panelCust");
+
+        function showTab(which) {
+            if (which === "emp") {
+                tabEmp.classList.add("active");
+                tabCust.classList.remove("active");
+                panelEmp.style.display = "block";
+                panelCust.style.display = "none";
+            } else {
+                tabCust.classList.add("active");
+                tabEmp.classList.remove("active");
+                panelCust.style.display = "block";
+                panelEmp.style.display = "none";
+            }
+        }
+
+        // ---------------- EMPLOYEE STATE ----------------
+        const employeeRows = document.getElementById("employeeRows");
+        const employeeModal = document.getElementById("employeeModal");
+        const employeeModalTitle = document.getElementById("employeeModalTitle");
+        const emp_staff_id = document.getElementById("emp_staff_id");
+        const emp_full_name = document.getElementById("emp_full_name");
+        const emp_department = document.getElementById("emp_department");
+        const emp_role = document.getElementById("emp_role");
+        const emp_work_email = document.getElementById("emp_work_email");
+
+        let empEditMode = false;
+        let empEditStaffId = null;
+
+        function loadEmployees() {
+            fetch("/api/employees")
+                .then(r => r.json())
+                .then(data => {
+                    employeeRows.innerHTML = "";
+                    data.forEach(e => {
+                        employeeRows.innerHTML += `
+                            <tr>
+                                <td>${e.staff_id}</td>
+                                <td>${e.full_name}</td>
+                                <td>${e.department}</td>
+                                <td>${e.role}</td>
+                                <td>${e.work_email}</td>
+                                <td>
+                                    <button class="edit-btn" onclick='openEmployeeEdit(${JSON.stringify(e)})'>Edit</button>
+                                    <button class="delete-btn" onclick="deleteEmployee('${e.staff_id}')">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+
+        function openEmployeeAdd() {
+            empEditMode = false;
+            empEditStaffId = null;
+            employeeModal.style.display = "block";
+            employeeModalTitle.innerText = "Add Employee";
+
+            emp_staff_id.disabled = false;
+            emp_staff_id.value = "";
+            emp_full_name.value = "";
+            emp_department.value = "";
+            emp_role.value = "";
+            emp_work_email.value = "";
+
+            emp_full_name.oninput = function () {
+                const namePart = emp_full_name.value.toLowerCase().replace(/\s+/g, '');
+                emp_work_email.value = namePart ? namePart + "@meod.com" : "";
+            };
+        }
+
+        function openEmployeeEdit(e) {
+            empEditMode = true;
+            empEditStaffId = e.staff_id;
+            employeeModal.style.display = "block";
+            employeeModalTitle.innerText = "Edit Employee";
+
+            emp_staff_id.value = e.staff_id;
+            emp_staff_id.disabled = true;
+            emp_full_name.value = e.full_name;
+            emp_department.value = e.department;
+            emp_role.value = e.role;
+            emp_work_email.value = e.work_email;
+
+            emp_full_name.oninput = null;
+        }
+
+        function closeEmployeeModal() { employeeModal.style.display = "none"; }
+
+        function saveEmployee() {
+            const payload = {
+                staff_id: emp_staff_id.value.trim().toUpperCase(),
+                full_name: emp_full_name.value.trim(),
+                department: emp_department.value,
+                role: emp_role.value,
+                work_email: emp_work_email.value.trim()
+            };
+
+            if (!payload.staff_id || !payload.full_name || !payload.department || !payload.role || !payload.work_email) {
+                alert("Please fill in all employee fields.");
+                return;
+            }
+
+            const url = empEditMode ? `/api/employees/${empEditStaffId}` : "/api/employees";
+            const method = empEditMode ? "PUT" : "POST";
+
+            fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success === false) { alert(res.message); return; }
+                    closeEmployeeModal();
+                    loadEmployees();
+                })
+                .catch(err => alert("Error: " + err));
+        }
+
+        function deleteEmployee(staffId) {
+            if (!confirm("Are you sure this employee resigned?")) return;
+            fetch(`/api/employees/${staffId}`, { method: "DELETE" })
+                .then(r => r.json())
+                .then(() => loadEmployees());
+        }
+
+        // ---------------- CUSTOMER STATE ----------------
+        const customerRows = document.getElementById("customerRows");
+        const customerModal = document.getElementById("customerModal");
+        const customerModalTitle = document.getElementById("customerModalTitle");
+        const cust_username = document.getElementById("cust_username");
+        const cust_password = document.getElementById("cust_password");
+        const cust_full_name = document.getElementById("cust_full_name");
+        const cust_email = document.getElementById("cust_email");
+        const cust_phone = document.getElementById("cust_phone");
+
+        let custEditMode = false;
+        let custEditCustomerId = null;
+
+        function loadCustomers() {
+            fetch("/api/customers")
+                .then(r => r.json())
+                .then(data => {
+                    customerRows.innerHTML = "";
+                    data.forEach(c => {
+                        customerRows.innerHTML += `
+                            <tr>
+                                <td>${c.customer_id}</td>
+                                <td>${c.username}</td>
+                                <td>${c.full_name || ""}</td>
+                                <td>${c.email_address || ""}</td>
+                                <td>
+                                    <button class="edit-btn" onclick='openCustomerEdit(${JSON.stringify(c)})'>Edit</button>
+                                    <button class="neutral-btn" onclick="resetCustomerPw('${c.customer_id}')">Reset PW</button>
+                                    <button class="delete-btn" onclick="deleteCustomer('${c.customer_id}')">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+
+        function openCustomerAdd() {
+            custEditMode = false;
+            custEditCustomerId = null;
+            customerModal.style.display = "block";
+            customerModalTitle.innerText = "Add Customer";
+
+            cust_username.value = "";
+            cust_password.value = "";
+            cust_full_name.value = "";
+            cust_email.value = "";
+            cust_phone.value = "";
+        }
+
+        function openCustomerEdit(c) {
+            custEditMode = true;
+            custEditCustomerId = c.customer_id;
+            customerModal.style.display = "block";
+            customerModalTitle.innerText = "Edit Customer";
+
+            cust_username.value = c.username || "";
+            cust_password.value = ""; // never show old password
+            cust_full_name.value = c.full_name || "";
+            cust_email.value = c.email_address || "";
+            cust_phone.value = c.phone_number || "";
+        }
+
+        function closeCustomerModal() { customerModal.style.display = "none"; }
+
+        function saveCustomer() {
+            const username = cust_username.value.trim();
+            const password = cust_password.value.trim();
+
+            if (!username) { alert("Username is required."); return; }
+
+            // Add mode requires password
+            if (!custEditMode) {
+                if (!password || password.length < 8) {
+                    alert("For new customer, password is required (min 8 chars).");
+                    return;
+                }
+
+                fetch("/api/customers", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        full_name: cust_full_name.value.trim(),
+                        email_address: cust_email.value.trim(),
+                        phone_number: cust_phone.value.trim()
+                    })
+                })
+                    .then(r => r.json())
+                    .then(res => {
+                        if (res.success === false) { alert(res.message); return; }
+                        closeCustomerModal();
+                        loadCustomers();
+                    })
+                    .catch(err => alert("Error: " + err));
+
+                return;
+            }
+
+            // Edit mode: update info (no password change here)
+            fetch(`/api/customers/${custEditCustomerId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: username,
+                    full_name: cust_full_name.value.trim(),
+                    email_address: cust_email.value.trim(),
+                    phone_number: cust_phone.value.trim()
+                })
+            })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success === false) { alert(res.message); return; }
+                    closeCustomerModal();
+                    loadCustomers();
+                })
+                .catch(err => alert("Error: " + err));
+        }
+
+        function resetCustomerPw(customerId) {
+            const newPw = prompt("Enter new password for this customer (min 8 chars):");
+            if (!newPw) return;
+            if (newPw.length < 8) { alert("Password must be at least 8 characters."); return; }
+
+            fetch(`/api/customers/${customerId}/resetpassword`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ new_password: newPw })
+            })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success === false) { alert(res.message); return; }
+                    alert("Password reset success.");
+                })
+                .catch(err => alert("Error: " + err));
+        }
+
+        function deleteCustomer(customerId) {
+            if (!confirm("Delete this customer account?")) return;
+            fetch(`/api/customers/${customerId}`, { method: "DELETE" })
+                .then(r => r.json())
+                .then(() => loadCustomers());
+        }
+
+        // initial load
+        loadEmployees();
+        loadCustomers();
+    </script>
+
+</body>
+
+</html>
