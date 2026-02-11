@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management - Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5; }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+            margin-bottom: 30px;
+        }
+        .back-logo {
+            position: absolute;
+            left: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .back-btn { font-size: 24px; text-decoration: none; color: #333; }
+        .logo { height: 70px; width: 90px; object-fit: contain; }
+        .title { font-size: 32px; font-weight: normal; }
+
+        .logout-btn {
+            position: absolute;
+            right: 0;
+            padding: 8px 16px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .logout-btn:hover { background: #c82333; }
+
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border: 2px solid #333;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th { background-color: #f2f2f2; font-weight: bold; }
+
+        .view-btn {
+            padding: 6px 16px;
+            border: 1px solid #333;
+            border-radius: 15px;
+            background: white;
+            cursor: pointer;
+            text-decoration: none;
+            color: #333;
+            display: inline-block;
+        }
+        .view-btn:hover { background: #f0f0f0; }
+
+        .items-list { list-style: none; padding: 0; margin: 0; }
+        .items-list li { margin-bottom: 4px; }
+
+        .status-placed { color: #0066cc; }
+        .status-delivered { color: #155724; }
+        .status-progress { color: #856404; }
+
+        .empty-state { text-align: center; padding: 50px; color: #999; }
+
+        /* ⭐ Added for status update form */
+        .status-form {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .status-select {
+            padding: 6px 10px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
+        }
+        .update-btn {
+            padding: 6px 14px;
+            border: 1px solid #333;
+            border-radius: 15px;
+            background: #46923c;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .update-btn:hover { background: #3a7a32; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="back-logo">
+            <a href="{{ url_for('admin_page') }}" class="back-btn">←</a>
+            <img src="logo.png" class="logo" alt="MEOD Logo" onerror="this.src='placeholder.jpg'">
+        </div>
+        <h2 class="title">Order Management</h2>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="search-container">
+        <input type="text" class="search-input" id="searchInput"
+               placeholder="🔍︎ Search by order number, customer name..."
+               onkeyup="searchOrders()">
+    </div>
+
+    <div class="container">
+        {% if orders %}
+        <table id="ordersTable">
+            <thead>
+                <tr>
+                    <th>Order No.</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Total Price</th>
+                    <th>Delivery Address</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>#{{ order.order_number }}</td>
+
+                    <td>
+                        {{ order.customer_name }}<br>
+                        <small>{{ order.customer_email }}</small><br>
+                        <small>{{ order.customer_phone }}</small>
+                    </td>
+
+                    <td>
+                        <ul class="items-list">
+                            {% for item in order.items %}
+                            <li>{{ item.item_name }} ({{ item.quantity }})</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+
+                    <td>${{ "%.2f"|format(order.total_price) }}</td>
+
+                    <td>
+                        {{ order.delivery_address }}<br>
+                        {{ order.postal_code }}
+                    </td>
+
+                    <td>{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else 'N/A' }}</td>
+
+                    <td class="status-{{ 'placed' if order.order_status == 'Order Placed' else 'progress' if order.order_status in ['Order Confirmed', 'Out for Delivery'] else 'delivered' }}">
+                        {{ order.order_status }}
+                    </td>
+
+                    <td>
+
+                        <div style="height: 10px;"></div>
+
+                        <!-- ⭐ NEW: Update status form -->
+                        <form class="status-form"
+                              method="POST"
+                              action="{{ url_for('admin_update_order_status', order_id=order.id) }}">
+                            <select name="order_status" class="status-select" required>
+                                <option value="Order Placed" {{ 'selected' if order.order_status == 'Order Placed' else '' }}>Order Placed</option>
+                                <option value="Order Confirmed" {{ 'selected' if order.order_status == 'Order Confirmed' else '' }}>Order Confirmed</option>
+                                <option value="Out for Delivery" {{ 'selected' if order.order_status == 'Out for Delivery' else '' }}>Out for Delivery</option>
+                                <option value="Delivered" {{ 'selected' if order.order_status == 'Delivered' else '' }}>Delivered</option>
+                            </select>
+                            <button type="submit" class="update-btn">Update</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+        <div class="empty-state">
+            <h3>No orders yet</h3>
+            <p>Orders will appear here once customers place them</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function searchOrders() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('ordersTable');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                const td = tr[i].getElementsByTagName('td');
+                let found = false;
+
+                for (let j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        const txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                tr[i].style.display = found ? '' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>

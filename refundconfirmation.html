@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refund Confirmation</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f8f8;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .logo-img {
+            position: absolute;
+            left: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .divider {
+            width: 70%;
+            height: 2px;
+            background: #000;
+            margin: 8px auto 15px;
+        }
+
+        .logo {
+            height: 70px;
+            width: 90px;
+            object-fit: contain;
+        }
+
+        h2 {
+            margin-top: 15px;
+        }
+
+        .confirm-box {
+            width: 65%;
+            margin: 0 auto;
+            border: 1px solid #000;
+            padding: 30px;
+            background: #fff;
+        }
+
+        .tick {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .success-message {
+            text-align: center;
+        }
+
+        .info-box {
+            display: block;
+            margin: 20px auto 0;
+            border: 2px solid #000;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .done-btn {
+            float: right;
+            background: #46923c;
+            border: 1px solid #000;
+            padding: 10px 25px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 30px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .done-btn:hover {
+            background: #3a7a32;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo-img">
+            <img src="/logo.png" class="logo" onerror="this.src='placeholder.jpg'">
+        </div>
+        <h2>Successful!</h2>
+    </div>
+    <div class="divider"></div>
+
+    <div class="confirm-box">
+        <img src="/tick.png" class="tick" alt="tick" onerror="this.style.display='none'">
+
+        <div class="success-message">
+            <h3>
+                Order #{{ refund_request.order.order_number }}
+            </h3>
+
+            <p>
+                Thank you! We have received your refund request.
+            </p>
+
+            <p style="color:#555; font-size:14px;">
+                Refund Status: <strong>{{ refund_request.status }}</strong>
+            </p>
+        </div>
+
+        <div class="info-box">
+            <em>
+                Your refund will be processed and will be deposited into your preferred
+                refund method in 7–14 days, after we have approved it.
+            </em>
+        </div>
+    </div>
+
+    <button class="done-btn" onclick="location.href='{{ url_for('customer_homepage') }}'">Done</button>
+</body>
+
+</html>

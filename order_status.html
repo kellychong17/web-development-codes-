@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Status - #{{ order.order_number }}</title>
+
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f8f8f8; }
+        .header { display: flex; align-items: center; justify-content: center; gap: 15px; position: relative; }
+        .back-logo { position: absolute; left: 0; display: flex; align-items: center; gap: 10px; }
+        .back-button { font-size: 28px; cursor: pointer; text-decoration: none; color: #000; }
+        .logo { height: 70px; width: 90px; object-fit: contain; }
+        h2 { margin: 15px 0; }
+        .divider { width: 70%; height: 2px; background: #000; margin: 4px auto 20px; }
+        .status-box { width: 70%; margin: 0 auto; border: 1px solid #000; padding: 25px; background: #fff; }
+        .order-title { font-weight: bold; font-size: 18px; margin-bottom: 20px; }
+        .timeline { position: relative; padding-left: 40px; }
+
+        .timeline-item { position: relative; margin-bottom: 30px; }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+        .timeline-item.active::before { background: #46923c; box-shadow: 0 0 0 4px #e8f5e9; }
+        .timeline-item.pending::before { background: #ccc; }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 20px;
+            width: 2px;
+            height: calc(100% + 10px);
+            background: #ccc;
+        }
+        .timeline-item:last-child::after { display: none; }
+
+        .timeline-status { font-weight: bold; margin-bottom: 5px; }
+        .timeline-time { color: #666; font-size: 14px; }
+
+        .delivery-info { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; }
+        .info-row { margin-bottom: 10px; }
+
+        .items-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; }
+        .item { display: flex; align-items: center; margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-radius: 5px; }
+        .item-image { width: 60px; height: 60px; border: 1px solid #ddd; margin-right: 15px; overflow: hidden; }
+        .item-image img { width: 100%; height: 100%; object-fit: cover; }
+        .item-details { flex: 1; }
+        .item-name { font-weight: bold; margin-bottom: 5px; }
+
+        .total-price { margin-top: 20px; text-align: right; font-size: 18px; font-weight: bold; }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="back-logo">
+            <a href="{{ url_for('order_history') }}" class="back-button">&#8592;</a>
+            <img src="logo.png" class="logo" alt="Logo" onerror="this.src='placeholder.jpg'">
+        </div>
+        <h2>Order Status</h2>
+    </div>
+
+    <div class="divider"></div>
+
+    {% set status = (order.order_status or '') %}
+
+    {# Simple “progress” rules:
+       - Order Placed: always active
+       - Order Confirmed: active if status != 'Order Placed'
+       - Out for Delivery: active if status in ['Out for Delivery', 'Delivered']
+       - Delivered: active if status == 'Delivered'
+    #}
+    {% set placed_active = True %}
+    {% set confirmed_active = status != 'Order Placed' %}
+    {% set out_active = status in ['Out for Delivery', 'Delivered'] %}
+    {% set delivered_active = status == 'Delivered' %}
+
+    <div class="status-box">
+        <div class="order-title">Order #{{ order.order_number }}</div>
+
+        <div class="timeline">
+            <div class="timeline-item {{ 'active' if placed_active else 'pending' }}">
+                <div class="timeline-status">Order Placed</div>
+                <div class="timeline-time">
+                    {{ order.created_at.strftime('%d %b %Y, %I:%M %p') if order.created_at else 'N/A' }}
+                </div>
+            </div>
+
+            <div class="timeline-item {{ 'active' if confirmed_active else 'pending' }}">
+                <div class="timeline-status">Order Confirmed</div>
+                <div class="timeline-time">
+                    {{ order.created_at.strftime('%d %b %Y, %I:%M %p') if order.created_at else 'N/A' }}
+                </div>
+            </div>
+
+            <div class="timeline-item {{ 'active' if out_active else 'pending' }}">
+                <div class="timeline-status">Out for Delivery</div>
+                <div class="timeline-time">
+                    {% if out_active %}
+                        In Progress
+                    {% else %}
+                        Pending
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="timeline-item {{ 'active' if delivered_active else 'pending' }}">
+                <div class="timeline-status">Delivered</div>
+                <div class="timeline-time">
+                    Expected: {{ order.delivery_date.strftime('%d %b %Y, %I:%M %p') if order.delivery_date else 'N/A' }}
+                </div>
+            </div>
+        </div>
+
+        <div class="delivery-info">
+            <h3>Delivery Information</h3>
+            <div class="info-row"><strong>Name:</strong> {{ order.customer_name }}</div>
+            <div class="info-row"><strong>Phone:</strong> {{ order.customer_phone }}</div>
+            <div class="info-row"><strong>Email:</strong> {{ order.customer_email }}</div>
+            <div class="info-row"><strong>Address:</strong> {{ order.delivery_address }}</div>
+            <div class="info-row"><strong>Postal Code:</strong> {{ order.postal_code }}</div>
+        </div>
+
+        <div class="items-section">
+            <h3>Order Items</h3>
+            {% for item in order.items %}
+            <div class="item">
+                <div class="item-image">
+                    <img src="{{ item.product.image_filename if item.product else 'placeholder.jpg' }}"
+                         alt="{{ item.item_name }}"
+                         onerror="this.src='placeholder.jpg'">
+                </div>
+                <div class="item-details">
+                    <div class="item-name">{{ item.item_name }}</div>
+                    <div>Quantity: {{ item.quantity }}</div>
+                    <div style="color:#666; font-size: 14px;">
+                        Line total: ${{ "%.2f"|format(item.price * item.quantity) }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="total-price">
+            Total: ${{ "%.2f"|format(order.total_price) }}
+        </div>
+    </div>
+
+</body>
+</html>

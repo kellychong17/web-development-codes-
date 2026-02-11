@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order #{{ refund_request.order.order_number }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px; }
+
+        .header { display: flex; align-items: center; margin-bottom: 30px; }
+        .back-btn { font-size: 24px; margin-right: 20px; text-decoration: none; color: #333; }
+        .logo { height: 70px; width: 90px; object-fit: contain; }
+        .title { flex: 1; text-align: center; font-size: 32px; font-weight: normal; }
+
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 40px; border: 2px solid #333; }
+        .section-title { font-size: 20px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
+
+        .reason-box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; min-height: 120px; background: #fafafa; line-height: 1.6; }
+
+        .info-box { border: 1px solid #333; padding: 20px; margin-bottom: 30px; line-height: 1.8; }
+        .info-box p { margin-bottom: 8px; }
+
+        .button-container { display: flex; justify-content: center; gap: 50px; margin-top: 30px; }
+        button {
+            padding: 12px 40px;
+            font-size: 16px;
+            border: 2px solid #333;
+            border-radius: 25px;
+            cursor: pointer;
+            background: white;
+            transition: all 0.3s;
+        }
+        button:hover { background: #f0f0f0; }
+        .reject-btn:hover { background: #ffe0e0; }
+        .approve-btn:hover { background: #e0ffe0; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <a href="{{ url_for('refund_requests') }}" class="back-btn">←</a>
+        <img src="/logo.png" class="logo" alt="MEOD Logo" onerror="this.src='placeholder.jpg'">
+
+        <div class="title">
+            Order #{{ refund_request.order.order_number }}
+            <span class="status-badge status-{{ refund_request.status.lower() }}">
+                {{ refund_request.status }}
+            </span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section-title">Refund Request</div>
+
+        <p style="margin-bottom: 10px;">
+            <strong>Reason provided by customer:</strong>
+        </p>
+        <div class="reason-box">
+            {{ refund_request.refund_reason }}
+        </div>
+
+        <div class="info-box">
+            <p><strong>Name:</strong> {{ refund_request.order.customer_name }}</p>
+            <p><strong>Phone number:</strong> {{ refund_request.order.customer_phone }}</p>
+            <p><strong>Email:</strong> {{ refund_request.order.customer_email }}</p>
+        </div>
+
+        {% if refund_request.status == 'Pending' %}
+        <div class="button-container">
+            <form method="POST" action="{{ url_for('reject_refund', request_id=refund_request.id) }}" style="display:inline;">
+                <button type="submit" class="reject-btn">Reject</button>
+            </form>
+            <form method="POST" action="{{ url_for('approve_refund', request_id=refund_request.id) }}" style="display:inline;">
+                <button type="submit" class="approve-btn">Approve</button>
+            </form>
+        </div>
+        {% else %}
+        <div style="text-align:center; margin-top:20px; color:#666;">
+            <p>This request has been {{ refund_request.status.lower() }}.</p>
+            {% if refund_request.processed_at %}
+            <p>Processed on: {{ refund_request.processed_at.strftime('%d/%m/%Y %H:%M') }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
