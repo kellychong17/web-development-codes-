@@ -1,0 +1,108 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f5f5f5;
+}
+
+.header {
+  background: white;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+}
+
+.logo {
+  height: 40px;
+  object-fit: contain;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 40px;
+  padding-bottom: 80px;
+  background: white;
+}
+
+h1 {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 40px;
+}
+
+.form-row {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  flex: 1;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #333;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.form-group select {
+  cursor: pointer;
+  appearance: none;
+  background: white;
+  padding-right: 30px;
+}
+
+.error {
+  display: none;
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.form-group.invalid .error {
+  display: block;
+}
+
+.form-group.invalid input,
+.form-group.invalid textarea {
+  border-color: red;
+}
+
+.submit-btn {
+  float: right;
+  padding: 12px 40px;
+  border: 2px solid #333;
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.submit-btn:hover {
+  background: #f5f5f5;
+}
