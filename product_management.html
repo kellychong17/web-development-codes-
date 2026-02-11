@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEOD - Online Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+        }
+
+        header {
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            padding: 20px 40px;
+            box-shadow: 0 4px 12px rgba(124,179,66,0.15);
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            padding: 8px 20px;
+            border-radius: 10px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(67,160,71,0.3);
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(67,160,71,0.4);
+        }
+
+        .search-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 14px 45px 14px 20px;
+            border: 2px solid #c8e6c9;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f9fdf9;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #66bb6a;
+            box-shadow: 0 0 0 3px rgba(102,187,106,0.1);
+            background-color: white;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #66bb6a;
+            font-size: 20px;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .icon-btn {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: white;
+            transition: all 0.3s;
+            position: relative;
+            padding: 10px;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(67,160,71,0.3);
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(67,160,71,0.4);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 6px rgba(238,90,82,0.4);
+        }
+
+        main {
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f9fdf9 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(67,160,71,0.2);
+            border-color: #66bb6a;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #e8f5e9 25%, #f1f8f4 25%, #f1f8f4 50%, #e8f5e9 50%, #e8f5e9 75%, #f1f8f4 75%);
+            background-size: 40px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #a5d6a7;
+        }
+
+        .product-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .product-name {
+            font-size: 18px;
+            color: #2e7d32;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .product-price {
+            font-size: 22px;
+            color: #43a047;
+            font-weight: bold;
+        }
+
+        /* Product Detail Page Styles */
+        .product-detail {
+            display: none;
+            background: linear-gradient(135deg, #ffffff 0%, #f9fdf9 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .product-detail.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .detail-container {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .detail-image {
+            flex: 0 0 450px;
+            height: 450px;
+            background: linear-gradient(135deg, #e8f5e9 25%, #f1f8f4 25%, #f1f8f4 50%, #e8f5e9 50%, #e8f5e9 75%, #f1f8f4 75%);
+            background-size: 40px 40px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            color: #a5d6a7;
+            box-shadow: 0 4px 16px rgba(67,160,71,0.1);
+        }
+
+        .detail-info {
+            flex: 1;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .detail-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+
+        .detail-price {
+            font-size: 32px;
+            color: #43a047;
+            font-weight: bold;
+        }
+
+        .detail-brand {
+            font-size: 20px;
+            color: #66bb6a;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .detail-description-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+
+        .detail-description {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .detail-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            max-width: 600px;
+        }
+
+        .detail-btn {
+            padding: 16px 30px;
+            border: 2px solid #66bb6a;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: white;
+            color: #43a047;
+            font-weight: 600;
+        }
+
+        .detail-btn:hover {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(67,160,71,0.3);
+        }
+
+        .add-to-cart-btn {
+            background: linear-gradient(135deg, #66bb6a, #43a047) !important;
+            color: white !important;
+            border-color: #43a047 !important;
+        }
+
+        .add-to-cart-btn:hover {
+            background: linear-gradient(135deg, #43a047, #2e7d32) !important;
+            border-color: #2e7d32 !important;
+            color: white !important;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67,160,71,0.2);
+        }
+
+        /* Shopping Cart Page Styles */
+        .cart-page {
+            display: none;
+            background: linear-gradient(135deg, #ffffff 0%, #f9fdf9 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .cart-page.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        .cart-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+            margin-bottom: 20px;
+            color: #2e7d32;
+        }
+
+        .cart-divider {
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #66bb6a, #43a047);
+            margin: 8px 0 25px;
+            border-radius: 2px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: linear-gradient(135deg, #f1f8f4, #e8f5e9);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            position: relative;
+            border: 2px solid #c8e6c9;
+            transition: all 0.3s;
+        }
+
+        .cart-item:hover {
+            box-shadow: 0 4px 12px rgba(67,160,71,0.15);
+        }
+
+        .cart-item-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #43a047;
+        }
+
+        .cart-item-img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #ddd;
+            border: 2px solid #c8e6c9;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2e7d32;
+        }
+
+        .cart-qty {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0;
+        }
+
+        .qty-btn {
+            border: 2px solid #66bb6a;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #43a047;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .qty-btn:hover {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            color: white;
+        }
+
+        .cart-item-price {
+            color: #43a047;
+            font-weight: bold;
+            margin-top: 5px;
+            font-size: 18px;
+        }
+
+        .cart-remove {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .cart-remove:hover {
+            color: #e74c3c;
+            background: #ffe8e8;
+            transform: scale(1.1);
+        }
+
+        .cart-summary {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 3px solid #c8e6c9;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .cart-total {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .cart-selected-count {
+            color: #66bb6a;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .cart-proceed-btn {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(67,160,71,0.3);
+        }
+
+        .cart-proceed-btn:hover {
+            background: linear-gradient(135deg, #43a047, #2e7d32);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(67,160,71,0.4);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .empty-cart h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #66bb6a;
+        }
+
+        .empty-cart-link {
+            color: #43a047;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: 2px solid #43a047;
+            border-radius: 8px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .empty-cart-link:hover {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* More Information Page Styles */
+        .more-info-page {
+            display: none;
+        }
+
+        .more-info-page.active {
+            display: block;
+            width: 100%;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        .sidebar {
+            display: none;
+        }
+
+        .info-content {
+            border-left: none;
+            padding-left: 0;
+            width: 100%;
+            max-width: 100%;
+            background: linear-gradient(135deg, #ffffff 0%, #f9fdf9 100%);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .info-title-section {
+            flex: 1;
+        }
+
+        .info-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+
+        .info-brand {
+            font-size: 18px;
+            color: #66bb6a;
+            font-weight: 500;
+        }
+
+        .info-price {
+            font-size: 28px;
+            color: #43a047;
+            font-weight: bold;
+        }
+
+        .info-section {
+            margin-bottom: 25px;
+        }
+
+        .info-section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .info-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .spec-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border: 2px solid #66bb6a;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #f9fdf9, #f1f8f4);
+        }
+
+        .spec-label {
+            font-size: 14px;
+            color: #2e7d32;
+            font-weight: 500;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #66bb6a;
+            background-color: white;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 6px;
+            color: #43a047;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .quantity-btn:hover {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            color: white;
+        }
+
+        .quantity-display {
+            min-width: 40px;
+            text-align: center;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .dietary-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .dietary-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #f1f8f4, #e8f5e9);
+            border-radius: 8px;
+            border: 2px solid #c8e6c9;
+        }
+
+        .checkmark {
+            color: #43a047;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            padding: 14px 32px;
+            border: 2px solid #66bb6a;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: white;
+            color: #43a047;
+            font-weight: 600;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(67,160,71,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .detail-container, .more-info-page {
+                flex-direction: column;
+            }
+
+            .detail-image {
+                flex: 0 0 300px;
+                height: 300px;
+                width: 100%;
+            }
+
+            .sidebar {
+                flex-direction: row;
+                flex: none;
+                overflow-x: auto;
+            }
+
+            .thumbnail {
+                flex: 0 0 120px;
+            }
+
+            .info-content {
+                border-left: none;
+                border-top: 3px solid #c8e6c9;
+                padding-left: 0;
+                padding-top: 20px;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-item {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo" onclick="showProductGrid()">MEOD</div>
+        <div class="search-container">
+            <input type="text" placeholder="search" id="searchInput">
+            <span class="search-icon">🔍</span>
+        </div>
+        <div class="header-icons">
+            <button class="icon-btn" id="cartBtn" onclick="showCart()">
+                🛒
+                <span class="cart-count" id="cartCount">0</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Product Grid -->
+        <div class="product-grid" id="productGrid"></div>
+
+        <!-- Product Detail Page -->
+        <div class="product-detail" id="productDetail">
+            <button class="back-btn" onclick="showProductGrid()">← Back to Products</button>
+            <div class="detail-container">
+                <div class="detail-image" id="detailImage">📦</div>
+                <div class="detail-info">
+                    <div class="detail-header">
+                        <div>
+                            <div class="detail-title" id="detailTitle">Product Name</div>
+                            <div class="detail-brand" id="detailBrand">Brand Name</div>
+                        </div>
+                        <div class="detail-price" id="detailPrice">$11.00</div>
+                    </div>
+                    <div class="detail-description-title">Brief Description of product:</div>
+                    <div class="detail-description" id="detailDescription">
+                        This is a high-quality product designed with care and attention to detail.
+                    </div>
+                    <div class="detail-buttons">
+                        <button class="detail-btn" onclick="showMoreInfo()">More Information</button>
+                        <button class="detail-btn" onclick="showReviews()">View Reviews</button>
+                        <button class="detail-btn add-to-cart-btn" onclick="addToCartFromDetail()">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shopping Cart Page -->
+        <div class="cart-page" id="cartPage">
+            <button class="back-btn" onclick="showProductGrid()">← Back to Products</button>
+            <div class="cart-header">
+                <h2>Shopping Cart (<span id="cartItemCount">0</span>)</h2>
+            </div>
+            <div class="cart-divider"></div>
+
+            <div id="cartItemsContainer">
+                <!-- Cart items will be inserted here -->
+            </div>
+
+            <div id="emptyCartMessage" class="empty-cart" style="display: none;">
+                <h3>Your cart is empty</h3>
+                <p><a href="#" onclick="showProductGrid(); return false;" class="empty-cart-link">Continue shopping</a></p>
+            </div>
+
+            <div class="cart-summary" id="cartSummary" style="display: none;">
+                <div>
+                    <div class="cart-selected-count">
+                        (<span id="selectedCount">0</span> SELECTED)
+                    </div>
+                    <div class="cart-total">
+                        TOTAL: $<span id="cartTotal">0.00</span>
+                    </div>
+                </div>
+                <button class="cart-proceed-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
+            </div>
+        </div>
+
+        <!-- More Information Page -->
+        <div class="more-info-page" id="moreInfoPage">
+            <div class="sidebar"></div>
+            
+            <div class="info-content">
+                <button class="back-btn" onclick="backToDetail()">← Back</button>
+                
+                <div class="info-header">
+                    <div class="info-title-section">
+                        <div class="info-title" id="infoTitle">Product Name</div>
+                        <div class="info-brand" id="infoBrand">Brand Name</div>
+                    </div>
+                    <div class="info-price" id="infoPrice">11.00</div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">Nutritional Information:</div>
+                    <div class="info-text" id="nutritionalInfo">
+                        Energy: 250 kcal per serving | Protein: 8g | Carbohydrates: 35g | Fat: 9g | Fiber: 3g | Sugar: 5g | Sodium: 400mg
+                    </div>
+                </div>
+
+                <div class="two-column">
+                    <div class="info-section">
+                        <div class="info-section-title">Ingredients:</div>
+                        <div class="info-text" id="ingredients">
+                            Wheat flour, water, salt, yeast, vegetable oil, natural preservatives
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <div class="info-section-title">Allergens:</div>
+                        <div class="info-text" id="allergens">
+                            Contains: Wheat, Gluten. May contain traces of nuts and dairy products
+                        </div>
+                    </div>
+                </div>
+
+                <div class="spec-row">
+                    <span class="spec-label" id="dimensions">Weight: 3.4kg, Dimensions: 68cm by 99cm by 77cm</span>
+                    <div class="quantity-control">
+                        <span class="spec-label">Quantity:</span>
+                        <button class="quantity-btn" onclick="changeQuantity(-1)">-</button>
+                        <span class="quantity-display" id="quantityDisplay">1</span>
+                        <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="dietary-info">
+                    <div class="dietary-item">
+                        <span>Vegan:</span>
+                        <span class="checkmark" id="veganCheck">✓</span>
+                    </div>
+                    <div class="dietary-item">
+                        <span>Halal:</span>
+                        <span id="halalCheck">-</span>
+                    </div>
+                    <div class="dietary-item">
+                        <span>Beef:</span>
+                        <span id="beefCheck">-</span>
+                    </div>
+                    <div class="dietary-item">
+                        <span>Gluten Free:</span>
+                        <span class="checkmark" id="glutenCheck">✓</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn add-to-cart-btn" onclick="addToCartFromMoreInfo()">Add to Cart</button>
+                    <button class="action-btn" onclick="showProductGrid()">View all Products</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const products = [
+            { 
+                id: 1, 
+                name: 'Blueberry Granola', 
+                brand: 'Nature\'s Best',
+                price: 29.99,
+                image: 'blueberrygranola.jpeg',
+                description: 'A delicious and nutritious granola made with real blueberries, whole grain oats, and honey. Perfect for breakfast or as a healthy snack, this granola is packed with antioxidants and fiber to keep you energized throughout the day.',
+                nutritional: 'Energy: 420 kcal per 100g | Protein: 9g | Carbohydrates: 65g | Fat: 14g | Fiber: 8g | Sugar: 18g | Sodium: 150mg',
+                ingredients: 'Whole grain oats, dried blueberries, honey, sunflower oil, almonds, cinnamon',
+                allergens: 'Contains: Tree nuts (almonds). May contain traces of other nuts and wheat',
+                dimensions: 'Weight: 500g, Dimensions: 20cm by 15cm by 8cm',
+                vegan: false,
+                halal: true,
+                beef: false,
+                glutenFree: false
+            },
+            { 
+                id: 2, 
+                name: 'Strawberry Jam', 
+                brand: 'Orchard Fresh',
+                price: 17.38,
+                image: 'strawberryjam.jpeg',
+                description: 'Premium strawberry jam made with sun-ripened strawberries and natural sweeteners. This artisanal jam captures the essence of fresh strawberries in every spoonful. Perfect on toast, scones, or as a dessert topping.',
+                nutritional: 'Energy: 250 kcal per 100g | Protein: 0.5g | Carbohydrates: 62g | Fat: 0.2g | Fiber: 1.5g | Sugar: 58g | Sodium: 5mg',
+                ingredients: 'Strawberries (60%), sugar, lemon juice, pectin',
+                allergens: 'None',
+                dimensions: 'Weight: 340g, Dimensions: 10cm by 10cm by 12cm',
+                vegan: true,
+                halal: true,
+                beef: false,
+                glutenFree: true
+            },
+            { 
+                id: 3, 
+                name: 'Broccoli', 
+                brand: 'Fresh Farms',
+                price: 9.00,
+                image: 'broccoli.jpeg',
+                description: 'Fresh, crisp broccoli florets harvested at peak ripeness. Rich in vitamins, minerals, and antioxidants, this versatile vegetable is perfect for steaming, roasting, or adding to your favorite dishes for a healthy boost.',
+                nutritional: 'Energy: 34 kcal per 100g | Protein: 2.8g | Carbohydrates: 7g | Fat: 0.4g | Fiber: 2.6g | Sugar: 1.7g | Sodium: 33mg',
+                ingredients: 'Fresh broccoli',
+                allergens: 'None',
+                dimensions: 'Weight: 500g, Dimensions: 15cm by 15cm by 20cm',
+                vegan: true,
+                halal: true,
+                beef: false,
+                glutenFree: true
+            },
+            { 
+                id: 4, 
+                name: 'Vegetable Bundle', 
+                brand: 'Garden Harvest',
+                price: 129.99,
+                image: 'vegetablebundle.jpg',
+                description: 'A carefully curated selection of fresh, seasonal vegetables including carrots, bell peppers, zucchini, tomatoes, and more. Perfect for meal prep or creating healthy, delicious meals for the whole family.',
+                nutritional: 'Varies by vegetable | Average: 40 kcal per 100g | High in vitamins A, C, and K',
+                ingredients: 'Assorted fresh vegetables: carrots, bell peppers, zucchini, tomatoes, onions, lettuce',
+                allergens: 'None',
+                dimensions: 'Weight: 3kg, Dimensions: 35cm by 25cm by 15cm',
+                vegan: true,
+                halal: true,
+                beef: false,
+                glutenFree: true
+            },
+            { 
+                id: 5, 
+                name: 'Fruit Basket', 
+                brand: 'Tropical Delights',
+                price: 49.99,
+                image: 'fruitbasket.jpg',
+                description: 'A vibrant assortment of fresh, handpicked fruits including apples, oranges, bananas, grapes, and seasonal specialties. Each fruit is carefully selected for optimal ripeness and flavor, making this basket perfect for healthy snacking or gift-giving.',
+                nutritional: 'Varies by fruit | Average: 60 kcal per 100g | Rich in vitamins, minerals, and natural sugars',
+                ingredients: 'Assorted fresh fruits: apples, oranges, bananas, grapes, kiwi, pears',
+                allergens: 'None',
+                dimensions: 'Weight: 2.5kg, Dimensions: 30cm by 30cm by 20cm',
+                vegan: true,
+                halal: true,
+                beef: false,
+                glutenFree: true
+            },
+            { 
+                id: 6, 
+                name: 'Tuna', 
+                brand: 'Ocean Catch',
+                price: 19.70,
+                image: 'tuna.jpg',
+                description: 'Premium sustainably-caught tuna packed in spring water. Rich in protein and omega-3 fatty acids, this versatile fish is perfect for sandwiches, salads, or pasta dishes. Wild-caught and dolphin-safe certified.',
+                nutritional: 'Energy: 132 kcal per 100g | Protein: 28g | Carbohydrates: 0g | Fat: 2g | Omega-3: 0.9g | Sodium: 320mg',
+                ingredients: 'Tuna, spring water, salt',
+                allergens: 'Contains: Fish',
+                dimensions: 'Weight: 185g, Dimensions: 8cm by 8cm by 4cm',
+                vegan: false,
+                halal: true,
+                beef: false,
+                glutenFree: true
+            },
+            { 
+                id: 7, 
+                name: 'Milk', 
+                brand: 'Dairy Pure',
+                price: 5.00,
+                image: 'milk.jpg',
+                description: 'Fresh, pasteurized whole milk from grass-fed cows. Rich, creamy, and packed with essential nutrients including calcium, vitamin D, and protein. Perfect for drinking, cooking, or adding to your morning coffee or cereal.',
+                nutritional: 'Energy: 61 kcal per 100ml | Protein: 3.2g | Carbohydrates: 4.8g | Fat: 3.3g | Calcium: 120mg | Vitamin D: 0.05μg',
+                ingredients: 'Pasteurized whole milk, vitamin D',
+                allergens: 'Contains: Milk',
+                dimensions: 'Volume: 2L, Dimensions: 10cm by 10cm by 25cm',
+                vegan: false,
+                halal: true,
+                beef: false,
+                glutenFree: true
+            },
+            { 
+                id: 8, 
+                name: 'Asparagus', 
+                brand: 'Green Valley',
+                price: 4.50,
+                image: 'asparagus.avif',
+                description: 'Fresh, tender asparagus spears hand-selected for quality and flavor. These nutrient-dense vegetables are excellent sources of fiber, vitamins, and minerals. Perfect for grilling, roasting, or steaming as a sophisticated side dish.',
+                nutritional: 'Energy: 20 kcal per 100g | Protein: 2.2g | Carbohydrates: 3.9g | Fat: 0.2g | Fiber: 2.1g | Folate: 52μg',
+                ingredients: 'Fresh asparagus',
+                allergens: 'None',
+                dimensions: 'Weight: 250g, Dimensions: 25cm by 10cm by 5cm',
+                vegan: true,
+                halal: true,
+                beef: false,
+                glutenFree: true
+            }
+        ];
+
+        let cart = [];
+        let currentProduct = null;
+        let quantity = 1;
+        
+        const productGrid = document.getElementById('productGrid');
+        const productDetail = document.getElementById('productDetail');
+        const moreInfoPage = document.getElementById('moreInfoPage');
+        const cartPage = document.getElementById('cartPage');
+        const cartCount = document.getElementById('cartCount');
+        const searchInput = document.getElementById('searchInput');
+
+        // Load cart from localStorage
+        function loadCart() {
+            const savedCart = localStorage.getItem('meodCart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                updateCartCount();
+            }
+        }
+
+        // Save cart to localStorage
+        function saveCart() {
+            localStorage.setItem('meodCart', JSON.stringify(cart));
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+        }
+
+        function renderProducts(productsToRender) {
+            productGrid.innerHTML = '';
+            productsToRender.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.onclick = () => showProductDetail(product.id);
+                card.innerHTML = `
+                    <div class="product-image">
+                        <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">$${product.price.toFixed(2)}</div>
+                    </div>
+                `;
+                productGrid.appendChild(card);
+            });
+        }
+
+        function showProductDetail(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                currentProduct = product;
+                document.getElementById('detailTitle').textContent = product.name;
+                document.getElementById('detailBrand').textContent = product.brand;
+                document.getElementById('detailPrice').textContent = `$${product.price.toFixed(2)}`;
+                document.getElementById('detailDescription').textContent = product.description;
+                document.getElementById('detailImage').innerHTML = `<img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">`;
+                
+                productGrid.style.display = 'none';
+                productDetail.classList.add('active');
+                moreInfoPage.classList.remove('active');
+                cartPage.classList.remove('active');
+            }
+        }
+
+        function showMoreInfo() {
+            if (currentProduct) {
+                document.getElementById('infoTitle').textContent = currentProduct.name;
+                document.getElementById('infoBrand').textContent = currentProduct.brand;
+                document.getElementById('infoPrice').textContent = currentProduct.price.toFixed(2);
+                document.getElementById('nutritionalInfo').textContent = currentProduct.nutritional;
+                document.getElementById('ingredients').textContent = currentProduct.ingredients;
+                document.getElementById('allergens').textContent = currentProduct.allergens;
+                document.getElementById('dimensions').textContent = currentProduct.dimensions;
+                
+                document.getElementById('veganCheck').textContent = currentProduct.vegan ? '✓' : '-';
+                document.getElementById('halalCheck').textContent = currentProduct.halal ? '✓' : '-';
+                document.getElementById('beefCheck').textContent = currentProduct.beef ? '✓' : '-';
+                document.getElementById('glutenCheck').textContent = currentProduct.glutenFree ? '✓' : '-';
+                
+                productDetail.classList.remove('active');
+                moreInfoPage.classList.add('active');
+            }
+        }
+
+        function backToDetail() {
+            moreInfoPage.classList.remove('active');
+            productDetail.classList.add('active');
+        }
+
+        function showProductGrid() {
+            productGrid.style.display = 'grid';
+            productDetail.classList.remove('active');
+            moreInfoPage.classList.remove('active');
+            cartPage.classList.remove('active');
+        }
+
+        function changeQuantity(delta) {
+            quantity = Math.max(1, quantity + delta);
+            document.getElementById('quantityDisplay').textContent = quantity;
+        }
+
+        function addToCartFromDetail() {
+            if (currentProduct) {
+                addToCart(currentProduct.id, 1);
+            }
+        }
+
+        function addToCartFromMoreInfo() {
+            if (currentProduct) {
+                const qty = parseInt(document.getElementById('quantityDisplay').textContent);
+                addToCart(currentProduct.id, qty);
+            }
+        }
+
+        function addToCart(productId, qty) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingItem = cart.find(item => item.productId === productId);
+            
+            if (existingItem) {
+                existingItem.quantity += qty;
+            } else {
+                cart.push({
+                    id: Date.now(),
+                    productId: productId,
+                    quantity: qty,
+                    selected: true
+                });
+            }
+            
+            saveCart();
+            alert(`${product.name} added to cart!`);
+        }
+
+        function showCart() {
+            renderCart();
+            productGrid.style.display = 'none';
+            productDetail.classList.remove('active');
+            moreInfoPage.classList.remove('active');
+            cartPage.classList.add('active');
+        }
+
+        function renderCart() {
+            const cartItemsContainer = document.getElementById('cartItemsContainer');
+            const emptyCartMessage = document.getElementById('emptyCartMessage');
+            const cartSummary = document.getElementById('cartSummary');
+            const cartItemCount = document.getElementById('cartItemCount');
+
+            cartItemCount.textContent = cart.length;
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '';
+                emptyCartMessage.style.display = 'block';
+                cartSummary.style.display = 'none';
+                return;
+            }
+
+            emptyCartMessage.style.display = 'none';
+            cartSummary.style.display = 'flex';
+
+            cartItemsContainer.innerHTML = '';
+            
+            cart.forEach(item => {
+                const product = products.find(p => p.id === item.productId);
+                if (!product) return;
+
+                const cartItemDiv = document.createElement('div');
+                cartItemDiv.className = 'cart-item';
+                cartItemDiv.id = `cart-item-${item.id}`;
+                
+                cartItemDiv.innerHTML = `
+                    <input type="checkbox" class="cart-item-checkbox" 
+                           ${item.selected ? 'checked' : ''} 
+                           onchange="toggleItemSelection(${item.id}, this.checked)">
+                    <img src="${product.image}" class="cart-item-img" alt="${product.name}">
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">${product.name} (${product.brand})</div>
+                        <div class="cart-qty">
+                            <button class="qty-btn" onclick="updateCartQuantity(${item.id}, -1)">-</button>
+                            <span id="cart-qty-${item.id}">${item.quantity}</span>
+                            <button class="qty-btn" onclick="updateCartQuantity(${item.id}, 1)">+</button>
+                        </div>
+                        <div class="cart-item-price" id="cart-price-${item.id}">
+                            $${(item.quantity * product.price).toFixed(2)}
+                        </div>
+                    </div>
+                    <span class="cart-remove" onclick="removeCartItem(${item.id})">×</span>
+                `;
+                
+                cartItemsContainer.appendChild(cartItemDiv);
+            });
+
+            updateCartSummary();
+        }
+
+        function updateCartQuantity(cartItemId, delta) {
+            const item = cart.find(i => i.id === cartItemId);
+            if (!item) return;
+
+            item.quantity += delta;
+            
+            if (item.quantity < 1) {
+                removeCartItem(cartItemId);
+                return;
+            }
+
+            saveCart();
+            renderCart();
+        }
+
+        function toggleItemSelection(cartItemId, selected) {
+            const item = cart.find(i => i.id === cartItemId);
+            if (item) {
+                item.selected = selected;
+                saveCart();
+                updateCartSummary();
+            }
+        }
+
+        function removeCartItem(cartItemId) {
+            if (confirm('Remove this item from cart?')) {
+                cart = cart.filter(item => item.id !== cartItemId);
+                saveCart();
+                renderCart();
+            }
+        }
+
+        function updateCartSummary() {
+            const selectedItems = cart.filter(item => item.selected);
+            const selectedCount = selectedItems.length;
+            
+            let total = 0;
+            selectedItems.forEach(item => {
+                const product = products.find(p => p.id === item.productId);
+                if (product) {
+                    total += item.quantity * product.price;
+                }
+            });
+
+            document.getElementById('selectedCount').textContent = selectedCount;
+            document.getElementById('cartTotal').textContent = total.toFixed(2);
+        }
+
+        function proceedToCheckout() {
+            const selectedItems = cart.filter(item => item.selected);
+            
+            if (selectedItems.length === 0) {
+                alert('Please select at least one item to proceed to checkout.');
+                return;
+            }
+
+            const total = selectedItems.reduce((sum, item) => {
+                const product = products.find(p => p.id === item.productId);
+                return sum + (product ? item.quantity * product.price : 0);
+            }, 0);
+
+            alert(`Proceeding to checkout with ${selectedItems.length} item(s)\nTotal: $${total.toFixed(2)}`);
+        }
+
+        function showReviews() {
+            alert('Reviews feature coming soon! This will show customer reviews and ratings.');
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = products.filter(p => 
+                p.name.toLowerCase().includes(searchTerm) ||
+                p.brand.toLowerCase().includes(searchTerm)
+            );
+            renderProducts(filtered);
+        });
+
+        // Initialize
+        loadCart();
+        renderProducts(products);
+    </script>
+</body>
+</html>
