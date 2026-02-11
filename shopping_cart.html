@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f8f8;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .back-logo {
+            position: absolute;
+            left: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .divider {
+            width: 70%;
+            height: 2px;
+            background: #000;
+            margin: 8px auto 15px;
+        }
+
+        .back-button {
+            font-size: 28px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #000;
+        }
+
+        .logo {
+            height: 70px;
+            width: 90px;
+            object-fit: contain;
+        }
+
+        h2 {
+            margin-top: 15px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            position: relative;
+        }
+
+        .item-img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 6px;
+            background: #ddd;
+        }
+
+        .qty {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 6px 0;
+        }
+
+        button {
+            border: 1px solid #ccc;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .remove {
+            position: absolute;
+            right: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .remove:hover {
+            color: #e74c3c;
+        }
+
+        .summary {
+            position: relative;
+            margin-top: 25px;
+            height: 90px;
+        }
+
+        .total {
+            position: absolute;
+            right: 0;
+            bottom: 45px;
+            font-weight: bold;
+        }
+
+        .proceed {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            font-weight: bold;
+            background: #46923c;
+            color: white;
+            border: 1px solid #000;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .proceed:hover {
+            background: #3a7a32;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="back-logo">
+            <a href="{{ url_for('customer_homepage') }}" class="back-button">&#8592;</a>
+            <img src="/logo.png" class="logo">
+        </div>
+        <h2>Shopping Cart (<span id="count">{{ cart_items|length }}</span>)</h2>
+    </div>
+    <div class="divider"></div>
+
+    {% if cart_items %}
+    <div id="cart">
+        {% for item in cart_items %}
+        <div class="cart-item" id="item-{{ item.id }}">
+            <input type="checkbox" {% if item.selected %}checked{% endif %}
+                onchange="toggleItem({{ item.id }}, this.checked)">
+            <img src="/image/{{ item.product.image_filename }}" class="item-img"
+                onerror="this.src='/image/placeholder.jpg'">
+            <div style="flex:1">
+                <strong>{{ item.product.name }} ({{ item.product.unit }})</strong>
+                <div class="qty">
+                    <button onclick="updateQuantity({{ item.id }}, -1)">-</button>
+                    <span id="qty-{{ item.id }}">{{ item.quantity }}</span>
+                    <button onclick="updateQuantity({{ item.id }}, 1)">+</button>
+                </div>
+                <span id="price-{{ item.id }}">${{ "%.2f"|format(item.quantity * item.product.price) }}</span>
+            </div>
+            <span class="remove" onclick="removeItem({{ item.id }})">×</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="summary">
+        <div class="total">
+            (<span id="selected">{{ cart_items|selectattr('selected')|list|length }}</span> SELECTED)
+            TOTAL: $<span id="total">{{ "%.2f"|format(cart_items|selectattr('selected')|map(attribute='quantity')|sum *
+                (cart_items|selectattr('selected')|map(attribute='product.price')|sum)) }}</span>
+        </div>
+        <form method="POST" action="{{ url_for('cart_proceed') }}" style="display: inline;">
+            <button type="submit" class="proceed">Proceed</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <h3>Your cart is empty</h3>
+        <p><a href="{{ url_for('products') }}">Continue shopping</a></p>
+    </div>
+    {% endif %}
+
+    <script>
+        function updateQuantity(cartId, change) {
+            const qtyElem = document.getElementById(`qty-${cartId}`);
+            let qty = parseInt(qtyElem.innerText) + change;
+
+            if (qty < 1) {
+                removeItem(cartId);
+                return;
+            }
+
+            fetch(`/cart/update/${cartId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quantity: qty })
+            }).then(() => {
+                location.reload();
+            });
+        }
+
+        function toggleItem(cartId, selected) {
+            fetch(`/cart/update/${cartId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ selected: selected })
+            }).then(() => {
+                location.reload();
+            });
+        }
+
+        function removeItem(cartId) {
+            if (confirm('Remove this item from cart?')) {
+                fetch(`/cart/remove/${cartId}`, {
+                    method: 'POST'
+                }).then(() => {
+                    location.reload();
+                });
+            }
+        }
+    </script>
+
+</body>
+
+</html>

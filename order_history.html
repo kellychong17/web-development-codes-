@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Order History</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f8f8;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .back-logo {
+            position: absolute;
+            left: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .divider {
+            width: 70%;
+            height: 2px;
+            background: #000;
+            margin: 4px auto 20px;
+        }
+
+        .back-button {
+            font-size: 28px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #000;
+        }
+
+        .logo {
+            height: 70px;
+            width: 90px;
+            object-fit: contain;
+        }
+
+        h2 {
+            margin-top: 15px;
+        }
+
+        .history-box {
+            width: 70%;
+            margin: 0 auto;
+            border: 1px solid #000;
+            padding: 20px;
+            background: #fff;
+        }
+
+        .orders-title {
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .order-card {
+            border: 1px solid #000;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            color: #1a73e8;
+            font-style: italic;
+            cursor: pointer;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .item-box {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #000;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .item-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .qty {
+            font-weight: bold;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            border: 1px solid #000;
+            background: #46923c;
+            padding: 5px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #3a7a32;
+        }
+
+        .end-text {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="back-logo">
+            <a href="{{ url_for('customer_homepage') }}" class="back-button">&#8592;</a>
+            <img src="logo.png" class="logo" onerror="this.src='placeholder.jpg'">
+        </div>
+
+        <h2>⟳ Order History</h2>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="history-box">
+        <div class="orders-title">Orders ({{ orders|length }})</div>
+
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="order-header">
+                <div>
+                    <strong>Order #{{ order.order_number }}</strong>
+                    {% if order.delivery_date %}
+                        &nbsp; {{ order.delivery_date.strftime('%d/%m/%y %H:%M') }}
+                    {% endif %}
+                </div>
+
+                <div class="status"
+                     onclick="location.href='{{ url_for('order_status', order_id=order.id) }}'">
+                    {{ order.order_status }}
+                </div>
+            </div>
+
+            {% for item in order.items %}
+            <div class="item">
+                <div class="item-box">
+                    <img src="{{ item.product.image_filename if item.product else 'placeholder.jpg' }}"
+                         onerror="this.src='placeholder.jpg'">
+                </div>
+
+                <div class="item-info">
+                    {{ item.item_name }}<br>
+                    ${{ "%.2f"|format(item.price * item.quantity) }}
+                </div>
+
+                <div class="qty">x{{ item.quantity }}</div>
+            </div>
+            {% endfor %}
+
+            <div class="order-footer">
+                <strong>Total: ${{ "%.2f"|format(order.total_price) }}</strong>
+                <div class="buttons">
+                    <button onclick="location.href='{{ url_for('order_summary', order_id=order.id) }}'">
+                        Order Again
+                    </button>
+                    <button onclick="location.href='{{ url_for('refund_form', order_id=order.id) }}'">
+                        Refund
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="end-text">- You have reached the end -</div>
+    </div>
+
+</body>
+
+</html>

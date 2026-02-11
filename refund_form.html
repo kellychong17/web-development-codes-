@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Refund</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f8f8;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .back-logo {
+            position: absolute;
+            left: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .divider {
+            width: 70%;
+            height: 2px;
+            background: #000;
+            margin: 4px auto 20px;
+        }
+
+        .back-button {
+            font-size: 28px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #000;
+        }
+
+        .logo {
+            height: 70px;
+            width: 90px;
+            object-fit: contain;
+        }
+
+        h2 {
+            margin-top: 15px;
+        }
+
+        .refund-box {
+            width: 70%;
+            margin: 0 auto;
+            border: 1px solid #000;
+            background: #fff;
+            padding: 25px;
+        }
+
+        .order-title {
+            font-weight: bold;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+
+        .inner-divider {
+            height: 1px;
+            background: #000;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 6px;
+            margin-top: 5px;
+            border: 1px solid #000;
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 3px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .phone-row {
+            display: flex;
+            gap: 5px;
+        }
+
+        .phone-row select {
+            width: 70px;
+        }
+
+        .upload-box {
+            margin-top: 15px;
+            border: 1px solid #000;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-box span {
+            font-size: 14px;
+        }
+
+        .upload-box input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .form-footer {
+            display: flex;
+            align-items: center;
+            margin-top: 25px;
+            font-size: 13px;
+        }
+
+        .footer-text {
+            flex: 1;
+            text-align: center;
+        }
+
+        .submit-btn {
+            font-weight: bold;
+            background: #46923c;
+            border: 1px solid #000;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .submit-btn:hover {
+            background: #3a7a32;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="back-logo">
+            <a href="{{ url_for('order_history') }}" class="back-button">&#8592;</a>
+            <img src="logo.png" class="logo">
+        </div>
+        <h2>Refund Request</h2>
+    </div>
+    <div class="divider"></div>
+
+    {% if success %}
+    <div class="success-message">
+        Refund request submitted successfully! Redirecting...
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('submit_refund', order_id=order.id) }}" enctype="multipart/form-data">
+        <div class="refund-box">
+            <div class="order-title">For order #{{ order.order_number }}</div>
+            <div class="inner-divider"></div>
+
+            <label>Please provide reason(s) for the refund. (~100 words) *</label>
+            <textarea name="refund_reason" id="refund_reason" required></textarea>
+            <div class="error" id="error-reason">Please fill out this field!</div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Name *</label>
+                    <input type="text" name="customer_name" id="customer_name" 
+                           value="{{ order.customer_name }}" required>
+                    <div class="error" id="error-name">Please fill out this field!</div>
+                </div>
+
+                <div class="col">
+                    <label>Phone number *</label>
+                    <div class="phone-row">
+                        <select name="phone_code">
+                            <option>+65</option>
+                        </select>
+                        <input type="text" name="customer_phone" id="customer_phone" 
+                               value="{{ order.customer_phone }}" required>
+                    </div>
+                    <div class="error" id="error-phone">Please fill out this field!</div>
+                </div>
+            </div>
+
+            <label>Email</label>
+            <input type="email" name="customer_email" id="customer_email" 
+                   value="{{ order.customer_email }}">
+
+            <label>Please upload picture (if any)</label>
+            <div class="upload-box">
+                <input type="file" name="upload_file" accept="image/*">
+                <span>Upload ⬆</span>
+            </div>
+
+            <div class="form-footer">
+                <div class="footer-text">
+                    Please note that only refunds with valid reason(s) will proceed *
+                </div>
+                <button type="submit" class="submit-btn">Submit</button>
+            </div>
+        </div>
+    </form>
+
+</body>
+
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refund Requests</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5; }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+            margin-bottom: 30px;
+        }
+        .back-logo {
+            position: absolute;
+            left: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .back-btn { font-size: 24px; text-decoration: none; color: #333; }
+        .logo { height: 70px; width: 90px; object-fit: contain; }
+        .title { font-size: 32px; font-weight: normal; margin: 0; }
+
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border: 2px solid #333;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; vertical-align: top; }
+        th { background-color: #f2f2f2; font-weight: bold; }
+
+        .view-btn {
+            padding: 6px 16px;
+            border: 1px solid #333;
+            border-radius: 15px;
+            background: #46923c;
+            cursor: pointer;
+            text-decoration: none;
+            color: #fff; /* ✅ FIX: readable */
+            display: inline-block;
+            font-weight: bold;
+        }
+        .view-btn:hover { opacity: 0.9; }
+
+        .items-list { list-style: none; padding: 0; margin: 0; }
+        .items-list li { margin-bottom: 4px; }
+
+        .status-pending { color: #856404; font-weight: bold; }
+        .status-approved { color: #155724; font-weight: bold; }
+        .status-rejected { color: #721c24; font-weight: bold; }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="back-logo">
+            <a href="{{ url_for('admin_page') }}" class="back-btn">←</a>
+            <img src="logo.png" class="logo" alt="MEOD Logo" onerror="this.src='placeholder.jpg'">
+        </div>
+        <h2 class="title">Refund Requests</h2>
+    </div>
+
+    <div class="search-container">
+        <input type="text" class="search-input" id="searchInput"
+               placeholder="🔍︎ Search by order number, name, status..."
+               onkeyup="searchRefunds()">
+    </div>
+
+    <div class="container">
+        <table id="refundTable">
+            <thead>
+                <tr>
+                    <th>Order No.</th>
+                    <th>Items No.</th>
+                    <th>Items</th>
+                    <th>Total Price</th>
+                    <th>Delivery Details</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for req in requests %}
+                <tr>
+                    <td>#{{ req.order.order_number }}</td>
+                    <td>{{ req.order.items|length }}</td>
+                    <td>
+                        <ul class="items-list">
+                            {% for item in req.order.items %}
+                            <li>{{ item.item_name }} ({{ item.quantity }})</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>${{ "%.2f"|format(req.order.total_price) }}</td>
+                    <td>
+                        {{ req.order.delivery_address }}<br>
+                        {{ req.order.postal_code }}<br>
+                        {{ req.order.delivery_date.strftime('%d/%m/%y %H:%M') if req.order.delivery_date else '' }}
+                    </td>
+                    <td class="status-{{ req.status.lower() }}">{{ req.status }}</td>
+                    <td>
+                        <a href="{{ url_for('view_refund_request', request_id=req.id) }}" class="view-btn">
+                            View info
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function searchRefunds() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('refundTable');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                const tds = tr[i].getElementsByTagName('td');
+                let found = false;
+
+                for (let j = 0; j < tds.length; j++) {
+                    const txtValue = tds[j].textContent || tds[j].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+                tr[i].style.display = found ? '' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>
