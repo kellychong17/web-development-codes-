@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEOD Farm Reviews</title>
+
+  <!-- Icons (optional but nice) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+
+<body>
+  <!-- Top bar -->
+  <header class="topbar">
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="brand">
+      <img 
+  src="{{ url_for('static', filename='images/meod-logo.png') }}" 
+  alt="Meod Logo"
+  class="brand-logo"
+/>
+
+    </div>
+
+    <nav class="topnav">
+      <a href="#">About Us</a>
+      <a href="#">Where to Buy</a>
+      <a href="#">Our Brands</a>
+      <a href="#">Articles</a>
+      <a href="#">Contact Us</a>
+    </nav>
+  </header>
+
+  <!-- Sidebar + Content wrapper -->
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <a class="side-link" href="#">
+        <i class="fa-solid fa-house"></i><span>Home</span>
+      </a>
+      <a class="side-link" href="#">
+        <i class="fa-solid fa-user"></i><span>Profile</span>
+      </a>
+      <a class="side-link" href="#">
+        <i class="fa-solid fa-gear"></i><span>Management</span>
+      </a>
+      <a class="side-link" href="#">
+        <i class="fa-solid fa-chart-column"></i><span>Issue &amp; Dashboard</span>
+      </a>
+      <a class="side-link" href="#">
+        <i class="fa-solid fa-box"></i><span>Order Management</span>
+      </a>
+
+      <!-- You want reviews here -->
+      <a class="side-link active" href="/">
+        <i class="fa-solid fa-star"></i><span>Review Management</span>
+      </a>
+
+      <a class="side-link" href="#">
+        <i class="fa-solid fa-clipboard-list"></i><span>Product Administration</span>
+      </a>
+
+      <div class="side-spacer"></div>
+
+      <button class="logout-btn" type="button">
+        Log out
+      </button>
+    </aside>
+
+    <!-- Main content -->
+    <main class="content">
+      <div class="page">
+        <h1 class="page-title">MEOD Farm Reviews</h1>
+        <p class="page-subtitle">Admin Moderation Dashboard</p>
+
+        <section class="reviews">
+          {% for r in reviews %}
+          <article class="review-card">
+            <h3 class="review-user">{{ r.username }}</h3>
+
+            <div class="review-meta">
+              <div class="review-product">
+                <strong>{{ r.product_name }}</strong>
+                <span class="muted">({{ r.product_id }})</span>
+              </div>
+              <div class="review-date muted">{{ r.date }}</div>
+            </div>
+
+            <div class="review-rating">Rating: <strong>{{ r.rating }}/5</strong></div>
+            <p class="review-comment">{{ r.comment }}</p>
+
+            <div class="review-status">
+              Status: <strong class="status-text" id="status-{{ r.id }}">{{ r.status }}</strong>
+            </div>
+
+            <div class="review-actions">
+              <button class="btn" data-id="{{ r.id }}" data-status="Approved">Approve</button>
+              <button class="btn" data-id="{{ r.id }}" data-status="Rejected">Reject</button>
+              <button class="btn" data-id="{{ r.id }}" data-status="Hidden">Hide</button>
+            </div>
+          </article>
+          {% endfor %}
+
+          {% if reviews|length == 0 %}
+            <div class="empty">No reviews found.</div>
+          {% endif %}
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Dark overlay for mobile when sidebar opens -->
+  <div class="overlay" id="overlay"></div>
+
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
